@@ -33,7 +33,6 @@ Compare to NoSQL databases that work with key/value pairs or are document stores
 * [Relational Database at Wikipedia](https://en.wikipedia.org/wiki/Relational_database)
 * [Non-relational (NoSQL) databases at Wikipedia](https://en.wikipedia.org/wiki/NoSQL)
 
-
 ## PostgreSQL
 
 PostgreSQL is a venerable relational database that is freely available
@@ -41,56 +40,7 @@ and world-class.
 
 https://www.postgresql.org/
 
-## Assignment: Install PostgreSQL
-
-**IMPORTANT!** These instructions assume you haven't already installed
-PostgreSQL. If you have already installed it, skip this section or
-Google for how to upgrade your installation.
-
-### Mac with Homebrew
-
-1. Open a terminal
-2. Install PostgreSQL: `brew install postgresql`
-3. Start the database process
-    * If you want to start it every time you log in, run:
-
-          brew services start postgresql
-
-    * If you want to just start it one time right now, run:
-
-          pg_ctl -D /usr/local/var/postgres start
-
-4. Create a database named the same as your username: `createdb $(whoami)`
-    * Optionally you can call it anything you want, but the shell
-      defaults to looking for a database named the same as your user.
-
-   This database will contain tables.
-
-Then start a shell by running `psql` and see if it works. You should see
-this prompt:
-
-    $ psql
-    psql (10.1)
-    Type "help" for help.
-
-    dbname=> 
-
-(Use `psql databasename` if you created the database under something
-other than your username.)
-
-Use `\l` to get a list of databases.
-
-You can enter `\q` to exit the shell.
-
-
-### Arch Linux
-
-Arch requires a bit more hands-on, but not much more. Check this out if
-you want to see a different Unix-y install procedure (or if you run
-Arch).
-
-* [Installing PostgreSQL on Arch
-  Linux](https://wiki.archlinux.org/index.php/PostgreSQL)
+* [Assignment: Install PostgreSQL](#assignment-install-postgresql)
 
 ## SQL, Structured Query Language
 
@@ -148,7 +98,7 @@ You can query the table with `SELECT`.
 
 Query all the rows and columnts:
 
-    dbname=> SELECT * FROM EMPLOYEE;
+    dbname=> SELECT * FROM Employee;
      id |  lastname   
     ----+-------------
      10 | Tanngnjostr
@@ -163,7 +113,7 @@ With SELECT, `*` means "all columns".
 
 You can choose specific columns:
 
-    dbname=> SELECT LastName FROM EMPLOYEE;
+    dbname=> SELECT LastName FROM Employee;
       lastname   
     -------------
      Tanngnjostr
@@ -176,13 +126,13 @@ You can choose specific columns:
 
 And you can search for specific rows with the `WHERE` clause:
 
-    dbname=> SELECT * FROM EMPLOYEE WHERE ID=12;
+    dbname=> SELECT * FROM Employee WHERE ID=12;
      id | lastname 
     ----+----------
      12 | Bob
     (1 row)
 
-    dbname=> SELECT * FROM EMPLOYEE WHERE ID=14 OR LastName='Bob';
+    dbname=> SELECT * FROM Employee WHERE ID=14 OR LastName='Bob';
      id | lastname 
     ----+----------
      12 | Bob
@@ -192,23 +142,91 @@ And you can search for specific rows with the `WHERE` clause:
 
 ### Update rows with UPDATE
 
+The `UPDATE` command can update one or many rows. Restrict which rows
+are updated with a `WHERE` clause.`
+
+    dbname=> UPDATE Employee SET LastName='Harvey' WHERE ID=10;
+    UPDATE 1
+
+    dbname=> SELECT * FROM Employee WHERE ID=10;
+     id | lastname 
+    ----+----------
+     10 | Harvey
+    (1 row)
+
+You can update multiple columns at once:
+
+    dbname=> UPDATE Employee SET LastName='Octothorpe', ID=99 WHERE ID=14;
+    UPDATE 1
+
+
+### Delete rows with DELETE
+
+Delete from a table with the `DELETE` command. Use a `WHERE` clause to
+restrict the delete.
+
+**CAUTION!** If you don't use a `WHERE` clause, all rows will be deleted
+from the table!
+
+Delete some rows:
+
+    dbname=> DELETE FROM Employee WHERE ID >= 15;
+    DELETE 2
+
+Delete **ALL** rows (*Danger, Will Robinson!*):
+
+    dbname=> DELETE FROM Employee;
+    DELETE 4
+
+* [Assignment: Create a Table and Use It](#assignment-create-a-table-and-use-it)
+  
+## Transactions
+
+In PostgreSQL, you can bundle a series of statements into a
+*transaction*. The transaction is executed *atomically*, which means
+either the entire transaction occurs, or none of the transaction occurs.
+There will never be a case where a transaction partially occurs.
+
+Create a transaction by starting with a `BEGIN` statement, followed by
+all the statements that are to be within the transaction.
+
+To execute the transaction ("Let's do it!"), end with a `COMMIT`
+statement.
+
+To abort the transaction and do nothing ("On second thought,
+nevermind!") end with a `ROLLBACK` statement.
+
+Usually transactions happen within a program that checks for sanity and
+either commits or rolls back.
+
+Pseudocode making DB calls that check if a rollback is necessary:
+
+    db("BEGIN"); // Begin transaction
+
+    db("UPDATE accounts SET balance = balance - 100.00
+        WHERE name = 'Alice'");
+
+    balance = db("SELECT balance WHERE name = 'Alice'");
+
+    // Don't let the balance go below zero:
+    if (balance < 0) {
+        db("ROLLBACK"); // Never mind!!
+    } else {
+        db("COMMIT"); // Plenty of cash
+    }
+    
+In the above example, the `UPDATE` and `SELECT` must happen at the same
+time (*atomically*) or else another process could sneak in between and
+withdraw too much money. Because it needs to be atomic, it's wrapped in
+a transaction.
+
+If you just enter a single SQL statement that is not inside a `BEGIN`
+transaction block, it gets automatically wrapped in a `BEGIN`/`COMMIT`
+block. It is a mini transaction that is `COMMIT`ted immediately.
+
+Not all SQL databases support transactions, but most do.
 
 # TODO
-* Lecture:
-    * SQL
-        * create table
-        * create rows, INSERT
-        * read rows, SELECT
-        * update rows, UPDATE
-        * delete rows, DELETE
-
-    * Transactions
-        * Not all DBs have them
-
-* Assignment:
-    * create table
-    * CRUD
-
 * Lecture:
     * CRUD
     * ACID
@@ -237,3 +255,89 @@ And you can search for specific rows with the `WHERE` clause:
     * RESTful API
 
 * Other RDBS: MySQL, Sqlite
+
+## Assignment: Install PostgreSQL
+
+**IMPORTANT!** These instructions assume you haven't already installed
+PostgreSQL. If you have already installed it, skip this section or
+Google for how to upgrade your installation.
+
+### Mac with Homebrew
+
+1. Open a terminal
+2. Install PostgreSQL: `brew install postgresql`
+3. Start the database process
+    * If you want to start it every time you log in, run:
+
+          brew services start postgresql
+
+    * If you want to just start it one time right now, run:
+
+          pg_ctl -D /usr/local/var/postgres start
+
+4. Create a database named the same as your username: `createdb $(whoami)`
+    * Optionally you can call it anything you want, but the shell
+      defaults to looking for a database named the same as your user.
+
+   This database will contain tables.
+
+Then start a shell by running `psql` and see if it works. You should see
+this prompt:
+
+    $ psql
+    psql (10.1)
+    Type "help" for help.
+
+    dbname=> 
+
+(Use `psql databasename` if you created the database under something
+other than your username.)
+
+Use `\l` to get a list of databases.
+
+You can enter `\q` to exit the shell.
+
+
+### Arch Linux
+
+Arch requires a bit more hands-on, but not much more. Check this out if
+you want to see a different Unix-y install procedure (or if you run
+Arch).
+
+* [Installing PostgreSQL on Arch
+  Linux](https://wiki.archlinux.org/index.php/PostgreSQL)
+
+
+## Assignment: Create a Table and Use It
+
+Launch the shell on your database, and create a table.
+
+    CREATE TABLE Employee (ID INT, FirstName VARCHAR(20), LastName VARCHAR(20));
+
+Insert some records:
+
+    INSERT INTO Employee VALUES (1, 'Alpha', 'Alphason');
+    INSERT INTO Employee VALUES (2, 'Bravo', 'Bravoson');
+    INSERT INTO Employee VALUES (3, 'Charlie', 'Charleson');
+    INSERT INTO Employee VALUES (4, 'Delta', 'Deltason');
+    INSERT INTO Employee VALUES (5, 'Echo', 'Ecoson');
+
+Select all records:
+
+    SELECT * FROM Employee;
+
+Select Employee #3's record:
+
+    SELECT * FROM Employee WHERE ID=3;
+
+Delete Employee #3's record:
+
+    DELETE FROM Employee WHERE ID=3;
+ 
+Use `SELECT` to verify the record is deleted.
+
+Update Employee #2's name to be "Foxtrot Foxtrotson":
+
+    UPDATE Employee SET FirstName='Foxtrot', LastName='Foxtrotson' WHERE ID=2;
+
+Use `SELECT` to verify the update.
