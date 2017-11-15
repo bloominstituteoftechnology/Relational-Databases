@@ -367,6 +367,8 @@ Not all SQL databases support transactions, but most do.
 
 ## Normalization and Normal Forms
 
+*[This topic is very deep and this section cannot do it full justice.]*
+
 *Normalization* is the process of designing or refactoring your tables
 for maximum consistency and minimum redundancy.
 
@@ -375,10 +377,72 @@ with speed in mind, and not so much consistency (sometimes NoSQL databases talk 
 
 Non-normalized tables are considered an anti-pattern in relational databases.
 
+There are many *normal forms*. We'll talk about First, Second, and Third
+normal forms.
+
+### First Normal Form (1NF)
+
+When a database is in first normal form, there is a primary key for each
+row, and there are no repeating sets of columns that should be in their
+own table.
+
+Unnormalized:
+
+    Farm
+        ID  AnimalName1  AnimalName2  AnimalName3  AnimalName4
+
+1NF:
+
+    Farm
+        ID
+
+    Animal
+        ID
+        FarmID [foreign key on Farm(ID)]
+        Name
+
+Use a *join* [TODO make link] to select all the animals in the farm:
+
+    SELECT Name FROM Animal, Farm WHERE Farm.ID = Animal.FarmID;
+
+TODO: verify above SQL
+
+### Second Normal Form (2NF)
+
+To be in 2NF, a table must already be in 1NF.
+
+Additionally, all non-key data must fully relate to the key data in the table.
+
+In the farm example, above, Animal has a Name and a key FarmID, but
+these two pieces of information are not related.
+
+We can fix this by adding a table to link the other two tables together:
+
+2NF:
+
+    Farm
+        ID
+
+    FarmAnimal
+        FarmID [foreign key on Farm(ID)]
+        AnimalID [foreign key on Animal(ID)]
+
+    Animal
+        ID
+        Name
+
+Use a *join* [TODO make link] to select all the animals in the farm:
+
+    SELECT Name FROM Animal, FarmAnimal, Farm
+        WHERE Farm.ID = FarmAnimal.FarmID AND
+              Animal.ID = FarmAnimal.AnimalID;
+
+TODO: verify above SQL
+
+
+### Third Normal Form (3NF)
 
 TODO
-
-
 
 # TODO
 
