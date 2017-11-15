@@ -198,6 +198,7 @@ away. Destroyed ...by the Empire.
 
 * **Assignment:** [Create a Table and Use It](#assignment-create-a-table-and-use-it)
   
+
 ## ACID and CRUD
 
 These are two common database terms.
@@ -303,7 +304,32 @@ created as follows:
         c INT,
         PRIMARY KEY (a, c));
 
+## Auto-increment Fields
+
+These are fields that the database manages, usually in an
+ever-increasing sequence. It's perfect for generation unique, numeric
+IDs for primary Keys.
+
+> In some databases (e.g MySQL) this is done with an `AUTO_INCREMENT`
+> keyword. PostgreSQL is different.
+
+In PostgreSQL, use the `SERIAL` keyword to auto-generate sequential
+numeric IDs for records.
+
+    CREATE TABLE Company (
+        ID SERIAL PRIMARY KEY,
+        NAME VARCHAR(20));
+
+When you insert, **do not** specify the ID field. Leave it blank, and
+the database will automatically generate one for you.
+
+    INSERT INTO Company VALUES ('My Awesome Company');
+
+
 ## Joins
+
+*This concept is* extremely important *to understanding how to use
+relational databases!*
 
 When you have two (or more) tables with data you wish to retrieve from
 both, you do so by using a *join*. These come in a number of varieties,
@@ -357,8 +383,7 @@ Above, we used a `WHERE` clause to perform the inner join. This is
 really common. But there is alternative syntax equivalent to the above:
 
     beejtestdb=> SELECT Employee.ID, Employee.Name, Department.Name
-                 FROM Employee
-                 INNER JOIN Department
+                 FROM Employee INNER JOIN Department
                  ON Employee.DepartmentID = Department.ID;
 
      id | name  |     name      
@@ -377,8 +402,7 @@ in for the missing values in the "right" table (the one after the
 Example:
 
     beejtestdb=> SELECT Employee.ID, Employee.Name, Department.Name
-                 FROM Employee
-                 LEFT JOIN Department
+                 FROM Employee LEFT JOIN Department
                  ON Employee.DepartmentID = Department.ID;
 
      id |  name   |     name      
@@ -399,8 +423,7 @@ the "right" table (the one after the `RIGHT JOIN` clause). It puts
 `FROM` clause.)
 
     beejtestdb=> SELECT Employee.ID, Employee.Name, Department.Name
-                 FROM Employee
-                 RIGHT JOIN Department
+                 FROM Employee RIGHT JOIN Department
                  ON Employee.DepartmentID = Department.ID;
 
      id | name  |     name      
@@ -437,9 +460,13 @@ both tables is selected, with `NULL` filling the gaps where necessary.
 
 ## Indexes
 
-When searching through tables, you use a `WHERE` clause to narrow things down. For speed, the columns mentioned in the `WHERE` clause should either be a primary key, or a column for which an *index* has been built.
+When searching through tables, you use a `WHERE` clause to narrow things
+down. For speed, the columns mentioned in the `WHERE` clause should
+either be a primary key, or a column for which an *index* has been
+built.
 
-Indexes help speed searches. In a large table, searching over an unindexed column will be *slow*.
+Indexes help speed searches. In a large table, searching over an
+unindexed column will be *slow*.
 
 Example of creating an index on the Employee table from the
 [Keys](#keys-primary-and-foreign) section:
@@ -473,6 +500,8 @@ There will never be a case where a transaction partially occurs.
 
 Create a transaction by starting with a `BEGIN` statement, followed by
 all the statements that are to be within the transaction.
+
+>`START TRANSACTION` is generally synonymous with `BEGIN` in SQL.
 
 To execute the transaction ("Let's do it!"), end with a `COMMIT`
 statement.
@@ -673,21 +702,15 @@ TODO Verify above SQL
 * [Database Normalization, Wikipedia](https://en.wikipedia.org/wiki/Database_normalization) (Dense)
 
 
+## Node-Postgres
 
-# TODO
+This is a library that allows you to interface with PostgreSQL through
+NodeJS.
 
+Its [documentation](https://node-postgres.com/) is exceptionally good.
 
-    * Node Postgres
-        * https://node-postgres.com/
-        * https://github.com/brianc/node-postgres
+* [Node-Postgres on GitHub](https://github.com/brianc/node-postgres)
 
-* Assignment:
-    * Load data into DB
-    * Command line query tool
-    * ExpressJS query tool
-    * RESTful API
-
-* Other RDBS: MySQL, Sqlite
 
 ## Assignment: Install PostgreSQL
 
@@ -774,3 +797,150 @@ Update Employee #2's name to be "Foxtrot Foxtrotson":
     UPDATE Employee SET FirstName='Foxtrot', LastName='Foxtrotson' WHERE ID=2;
 
 Use `SELECT` to verify the update.
+
+
+## Assignment: NodeJS Program to Create and Populate a Table
+
+Using [Node-Postgres](https://node-postgres.com/), write a program that
+creates a table.
+
+Run the following query:
+
+    CREATE TABLE IF NOT EXISTS Earthquake
+        (Name VARCHAR(20), Magnitude REAL)
+
+Populate the table with the following data:
+
+```javascript
+let data = [
+    ["Earthquake 1", 2.2],
+    ["Earthquake 2", 7.0],
+    ["Earthquake 3", 1.8],
+    ["Earthquake 4", 5.2],
+    ["Earthquake 5", 2.9],
+    ["Earthquake 6", 0.6],
+    ["Earthquake 7", 6.6]
+];
+```
+
+You'll have to run an `INSERT` statement for each one.
+
+Open a PostgreSQL shell (`psql`) and verify the table exists:
+
+    user-> \dt
+              List of relations
+     Schema |    Name    | Type  | Owner 
+    --------+------------+-------+-------
+     public | earthquake | table | user
+    (1 row)
+
+Also verify it is populated:
+
+    user-> SELECT * from Earthquake;
+    
+         name     | magnitude 
+    --------------+-----------
+     Earthquake 1 |       2.2
+     Earthquake 2 |         7
+     Earthquake 3 |       1.8
+     Earthquake 4 |       5.2
+     Earthquake 5 |       2.9
+     Earthquake 6 |       0.6
+     Earthquake 7 |       6.6
+    (7 rows)
+
+Hints:
+* [CREATE TABLE](#create-a-table-with-create-table)
+* [Connecting to the database](https://node-postgres.com/features/connecting)
+* [Running a query](https://node-postgres.com/features/queries)
+
+Extra Credit:
+* Add an ID field to help normalize the database. Make this field
+  `SERIAL` to auto-increment.
+* Add Date, Lat, and Lon fields to record more information about the
+  event.
+
+## Assignment: Command-line Earthquake Query Tool
+
+Write a tool that queries the database for earthquakes that are at least
+a given magnitude.
+
+    $ node earthquake 2.9
+    Earthquakes with magnitudes greater than or equal to 2.9:
+    
+    Earthquake 2: 7
+    Earthquake 7: 6.6
+    Earthquake 4: 5.2
+    Earthquake 5: 2.9
+
+Use `ORDER BY Magnitude DESC` to order the results in descending order
+by magnitude.
+
+
+## Assignment: RESTful Earthquake Data Server
+
+Use [ExpressJS](https://expressjs.com/) and write a webserver that
+implements a RESTful API to access the earthquake data.
+
+Endpoints:
+
+`/` (GET) Output usage information in HTML.
+
+Example results:
+
+```html
+<html>
+    <body>Usage: [endpoint info]</body>
+</html>
+```
+
+`/minmag` (GET) Output JSON list of earthquakes that are larger than the
+value specified in the `mag` parameter. Use form encoding to pass the
+data.
+
+Example results:
+
+```json
+{
+    "results": [
+        {
+            "name": "Earthquake 2",
+            "magnitude": 7
+        },
+        {
+            "name": "Earthquake 4",
+            "magnitude": 5.2
+        }
+    ]
+}
+```
+
+Extra Credit:
+
+`/new` (POST) Add a new earthquake to the database. Use form encoding to
+pass `name` and `mag`. Return a JSON status message:
+
+```json
+{ "status": "ok" }
+```
+
+or
+
+```json
+{ "status": "error", "message": "[error message]" }
+```
+
+
+`/delete` (DELETE) Delete an earthquake from the database. Use form
+encoding to pass `name`. Return status similar to `/new`, above.
+
+
+# TODO
+
+* ORDER BY, GROUP BY
+
+* Security
+    * Passwords, don't store in source control
+    * Don't construct queries from scratch in software; use parameterized queries
+
+* Other RDBS: MySQL, Sqlite
