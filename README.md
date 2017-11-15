@@ -796,6 +796,7 @@ SELECT Name, Farm.ID
 * [Database Normalization, Wikipedia](https://en.wikipedia.org/wiki/Database_normalization) (Dense)
 
 
+
 ## Node-Postgres
 
 This is a library that allows you to interface with PostgreSQL through
@@ -804,6 +805,25 @@ NodeJS.
 Its [documentation](https://node-postgres.com/) is exceptionally good.
 
 * [Node-Postgres on GitHub](https://github.com/brianc/node-postgres)
+
+### Security
+
+When writing code that accesses databases, there are a few rules you
+should follow to keep things safe.
+
+* Don't store database passwords or other sensitive information in your
+  code repository. Store dummy credentials instead.
+
+* When building SQL queries in code, use [*parameterized
+  queries*](https://node-postgres.com/features/queries#parameterized-query).
+  You build your query with parameter placeholders for where the query
+  arguments will go.
+  
+  This is your number-one line of defense against [SQL injection
+  attacks](https://en.wikipedia.org/wiki/SQL_injection).
+
+  **It's a seriously noob move to not use parameterized queries.**
+
 
 ### Assignments
 
@@ -1051,9 +1071,5 @@ encoding to pass `name`. Return status similar to `/new`, above.
 
 
 # TODO
-
-* Security
-    * Passwords, don't store in source control
-    * Don't construct queries from scratch in software; use parameterized queries
 
 * Other RDBS: MySQL, Sqlite
