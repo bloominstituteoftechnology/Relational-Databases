@@ -413,6 +413,28 @@ Non-normalized tables are considered an anti-pattern in relational databases.
 There are many *normal forms*. We'll talk about First, Second, and Third
 normal forms.
 
+### Anomalies
+
+One of the reasons for normalizing tables is to avoid *anomalies*.
+
+*Insert anomaly*: When we cannot insert a row into the table because
+some of the dependent information is not yet known. For example, we
+cannot create a new class record in the school database, because the
+record requires at least one student, and none have enrolled yet.
+
+*Update anomaly*: When information is duplicated in the database *and*
+some rows are updated but not others. For example, say a record contains
+a city and a zipcode, but then the post office changes the zipcode. If
+some of the records are updated but not others, some cities will have
+the old zipcodes.
+
+*Delete anomaly*: The opposite of an insert anomaly. When we delete some
+information and other related information must also be deleted against
+our will. For example, deleting the last student from a course causes
+the other course information to be also deleted.
+
+By normalizing your tables, you can avoid these anomalies.
+
 ### First Normal Form (1NF)
 
 When a database is in first normal form, there is a primary key for each
@@ -511,10 +533,7 @@ TODO Verify above SQL
 
 # TODO
 
-* EXPLAIN
-
 * Normalization
-    * Normal forms overview
     * Anomalies
     * https://www.essentialsql.com/get-ready-to-learn-sql-database-normalization-explained-in-simple-english/
     * https://support.microsoft.com/en-us/help/283878/description-of-the-database-normalization-basics 
