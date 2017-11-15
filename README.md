@@ -73,6 +73,14 @@ Use the `\dt` command to show which tables exist:
     public | employee | table | beej
     (1 row)
 
+Use the `\d` command to see what columns a table has:
+
+    dbname=> \d Employee
+                            Table "public.employee"
+        Column    |         Type          | Collation | Nullable | Default 
+    --------------+-----------------------+-----------+----------+---------
+     id           | integer               |           |          | 
+     lastname     | character varying(20) |           |          | 
 
 ### Create a row with INSERT
 
@@ -178,8 +186,116 @@ Delete **ALL** rows (*Danger, Will Robinson!*):
     dbname=> DELETE FROM Employee;
     DELETE 4
 
+### Deleting entire tables with DROP
+
+If you want to get rid of an entire table, use `DROP`.
+
+**WARNING!** There is no going back. Table will be completely blown
+away. Destroyed ...by the Empire.
+
+    dbname=> DROP TABLE Employee;
+    DROP TABLE
+
 * [Assignment: Create a Table and Use It](#assignment-create-a-table-and-use-it)
   
+## ACID and CRUD
+
+These are two common database terms.
+
+### ACID
+
+Short for *Atomicity*, *Consistency*, *Isolation*, *Durability*. When
+people mention "ACID-compliance", they're generally talking about the
+ability of the database to accurately record transactions in the case of
+crash or power failure.
+
+Atomicity: all transactions will be "all or nothing".
+
+Consistency: all transactions will leave the database in a consistent
+state with all its defined rules and constraints.
+
+Isonlation: the results of concurrent transactions is the same as if
+those transactions had been executed sequentially.
+
+Durability: Once a transaction is committed, it will remain committed,
+despite crashes, power outages, snow, and sleet.
+
+### CRUD
+
+Short for *Create*, *Read*, *Update*, *Delete*. Describes the four basic
+functions of a data store.
+
+In a relational database, these functions are handled by `INSERT`,
+`SELECT`, `UPDATE`, and `DELETE`.
+
+## NULL and NOT NULL
+
+Columns in records can sometimes have no data, referred to by the
+special keyword as `NULL`. Sometimes it makes sense to have NULL fields,
+and sometimes it doesn't.
+
+If you explicitly want to disallow NULL fields in your table, you can
+create the fields with the `NOT NULL` constraint:
+
+    CREATE TABLE Employee (
+        ID INT NOT NULL,
+        LastName VARCHAR(20));
+
+## Keys, Primary and Foreign
+
+Rows in a table often have one column that is called the *primary key*.
+The value in this column applies to all the rest of the data in the
+record. For example, an `EmployeeID` would be a great primary key,
+assuming the rest of the record held employee information.
+
+    Employee
+        ID (Primary Key)  LastName  FirstName  DepartmentID
+
+To create a table and specify the primary key, use the `NOT NULL` and
+`PRIMARY KEY` constraints:
+
+    CREATE TABLE Employee (
+        ID INT NOT NULL PRIMARY KEY,
+        LastName VARCHAR(20),
+        FirstName VARCHAR(20),
+        DepartmentID INT);
+
+You can always search quickly by primary key.
+
+If a key refers to a primary key in another table, it is called a
+*foreign key*. You are not allowed to make changes to the database that
+would cause the foreign key to refer to a non-existent record.
+
+The database uses this to maintain *referential integrity*.
+
+Create a foreign key using the `REFERENCES` constraint. It specifies the
+remote table and column the key refers to.
+
+    CREATE TABLE Department (
+        ID INT NOT NULL PRIMARY KEY,
+        Name VARCHAR(20));
+
+    CREATE TABLE Employee (
+        ID INT NOT NULL PRIMARY KEY,
+        LastName VARCHAR(20),
+        FirstName VARCHAR(20),
+        DepartmentID INT REFERENCES Department(ID));
+
+In the above example, you cannot add a row to `Employee` until that
+`DepartmentID` already exists in `Department`'s `ID`.
+
+Also, you cannot delete a row from `Department` if that row's `ID` was a
+`DepartmentID` in `Employee`.
+
+
+## Indexes
+
+When searching through tables, you use a `WHERE` clause to narrow things down. For speed, the columns mentioned in the `WHERE` clause should either be a primary key, or a column for which an *index* has been built.
+
+Indexes help speed searches. In a large table, searching over an unindexed column will be *slow*.
+
+TODO index example
+
 ## Transactions
 
 In PostgreSQL, you can bundle a series of statements into a
@@ -194,7 +310,8 @@ To execute the transaction ("Let's do it!"), end with a `COMMIT`
 statement.
 
 To abort the transaction and do nothing ("On second thought,
-nevermind!") end with a `ROLLBACK` statement.
+nevermind!") end with a `ROLLBACK` statement. *This makes it like
+nothing within the transaction ever happened.*
 
 Usually transactions happen within a program that checks for sanity and
 either commits or rolls back.
@@ -210,7 +327,7 @@ Pseudocode making DB calls that check if a rollback is necessary:
 
     // Don't let the balance go below zero:
     if (balance < 0) {
-        db("ROLLBACK"); // Never mind!!
+        db("ROLLBACK"); // Never mind!! Roll it all back.
     } else {
         db("COMMIT"); // Plenty of cash
     }
@@ -226,10 +343,23 @@ block. It is a mini transaction that is `COMMIT`ted immediately.
 
 Not all SQL databases support transactions, but most do.
 
+## Normalization and Normal Forms
+
+*Normalization* is the process of designing or refactoring your tables
+for maximum consistency and minimum redundancy.
+
+With NoSQL databases, we're used to *denormalized* data that is stored
+with speed in mind, and not so much consistency (sometimes NoSQL databases talk about *eventual consistency*).
+
+Non-normalized tables are considered an anti-pattern in relational databases.
+
+
+
+
+
 # TODO
-* Lecture:
-    * CRUD
-    * ACID
+    * Keys, indexes
+
     * Normalization
         * Normal forms overview
         * Anomalies
