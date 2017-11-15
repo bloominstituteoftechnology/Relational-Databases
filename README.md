@@ -294,7 +294,28 @@ When searching through tables, you use a `WHERE` clause to narrow things down. F
 
 Indexes help speed searches. In a large table, searching over an unindexed column will be *slow*.
 
-TODO index example
+Example of creating an index on the Employee table from the
+[Keys](#keys-primary-and-foreign) section:
+
+    dbname=> CREATE INDEX ON Employee (LastName);
+    CREATE INDEX
+
+    dbname=> \d Employee
+                            Table "public.employee"
+        Column    |         Type          | Collation | Nullable | Default 
+    --------------+-----------------------+-----------+----------+---------
+     id           | integer               |           | not null | 
+     lastname     | character varying(20) |           |          | 
+     firstname    | character varying(20) |           |          | 
+     departmentid | integer               |           |          | 
+    Indexes:
+        "employee_pkey" PRIMARY KEY, btree (id)
+        "employee_lastname_idx" btree (lastname)
+    Foreign-key constraints:
+        "employee_departmentid_fkey" FOREIGN KEY (departmentid) REFERENCES department(id)
+
+* [PostgreSQL CREATE INDEX documentation](https://www.postgresql.org/docs/current/static/sql-createindex.html)
+
 
 ## Transactions
 
@@ -343,6 +364,7 @@ block. It is a mini transaction that is `COMMIT`ted immediately.
 
 Not all SQL databases support transactions, but most do.
 
+
 ## Normalization and Normal Forms
 
 *Normalization* is the process of designing or refactoring your tables
@@ -354,11 +376,13 @@ with speed in mind, and not so much consistency (sometimes NoSQL databases talk 
 Non-normalized tables are considered an anti-pattern in relational databases.
 
 
+TODO
 
 
 
 # TODO
-    * Keys, indexes
+
+    * EXPLAIN
 
     * Normalization
         * Normal forms overview
