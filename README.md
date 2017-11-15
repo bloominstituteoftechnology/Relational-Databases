@@ -303,6 +303,138 @@ created as follows:
         c INT,
         PRIMARY KEY (a, c));
 
+## Joins
+
+When you have two (or more) tables with data you wish to retrieve from
+both, you do so by using a *join*. These come in a number of varieties,
+some of which are covered here.
+
+Tables to use in these examples:
+
+    CREATE TABLE Department (
+        ID INT NOT NULL PRIMARY KEY,
+        Name VARCHAR(20));
+
+    CREATE TABLE Employee (
+        ID INT NOT NULL PRIMARY KEY,
+        Name VARCHAR(20),
+        DepartmentID INT);
+
+    INSERT INTO Department VALUES (10, 'Marketing');
+    INSERT INTO Department VALUES (11, 'Sales');
+    INSERT INTO Department VALUES (12, 'Entertainment');
+
+    INSERT INTO Employee VALUES (1, 'Alice', 10);
+    INSERT INTO Employee VALUES (2, 'Bob', 12);
+    INSERT INTO Employee VALUES (3, 'Charlie', 99);
+
+**NOTE**: Importantly, department ID 11 is not referred to from
+`Employee`, and department ID 99 (Charlie) does not exist in
+`Department`. This is instrumental in the following examples.
+
+
+### Inner Join, The Most Common Join
+
+This is a standard join, what people mean when they just say "join".
+
+This will return only the rows that match the requirements from **both**
+tables.
+
+For example, we don't see "Sales" or "Charlie" in the join because
+neither of them match up to the other table:
+
+    beejtestdb=> SELECT Employee.ID, Employee.Name, Department.Name
+                 FROM Employee, Department
+                 WHERE Employee.DepartmentID = Department.ID;
+    
+     id | name  |     name      
+    ----+-------+---------------
+      1 | Alice | Marketing
+      2 | Bob   | Entertainment
+    (2 rows)
+
+Above, we used a `WHERE` clause to perform the inner join. This is
+really common. But there is alternative syntax equivalent to the above:
+
+    beejtestdb=> SELECT Employee.ID, Employee.Name, Department.Name
+                 FROM Employee
+                 INNER JOIN Department
+                 ON Employee.DepartmentID = Department.ID;
+
+     id | name  |     name      
+    ----+-------+---------------
+      1 | Alice | Marketing
+      2 | Bob   | Entertainment
+    (2 rows)
+
+### Left Outer Join
+
+This join works like an inner join, but also returns *all* the rows from
+the "left" table (the one after the `FROM` clause). It puts `NULL`
+in for the missing values in the "right" table (the one after the
+`LEFT JOIN` clause.)
+
+Example:
+
+    beejtestdb=> SELECT Employee.ID, Employee.Name, Department.Name
+                 FROM Employee
+                 LEFT JOIN Department
+                 ON Employee.DepartmentID = Department.ID;
+
+     id |  name   |     name      
+    ----+---------+---------------
+      1 | Alice   | Marketing
+      2 | Bob     | Entertainment
+      3 | Charlie | 
+    (3 rows)
+
+Notice that even though Charlie's department isn't found in `Department`, his record is still listed with a `NULL` department name.
+
+
+### Right Outer Join
+
+This join works like an inner join, but also returns *all* the rows from
+the "right" table (the one after the `RIGHT JOIN` clause). It puts
+`NULL` in for the missing values in the "right" table (the one after the
+`FROM` clause.)
+
+    beejtestdb=> SELECT Employee.ID, Employee.Name, Department.Name
+                 FROM Employee
+                 RIGHT JOIN Department
+                 ON Employee.DepartmentID = Department.ID;
+
+     id | name  |     name      
+    ----+-------+---------------
+      1 | Alice | Marketing
+      2 | Bob   | Entertainment
+        |       | Sales
+    (3 rows)
+
+Notice that even though there are no employees in the Sales department,
+the Sales name is listed with a `NULL` employee name.
+
+### Full Outer Join
+
+This is a blend of a Left and Right Outer Join. All information from
+both tables is selected, with `NULL` filling the gaps where necessary.
+
+     beejtestdb=> SELECT Employee.ID, Employee.Name, Department.Name
+                  FROM Employee
+                  FULL JOIN Department
+                  ON Employee.DepartmentID = Department.ID;
+                
+     id |  name   |     name      
+    ----+---------+---------------
+      1 | Alice   | Marketing
+      2 | Bob     | Entertainment
+      3 | Charlie | 
+        |         | Sales
+    (4 rows)
+
+* [Join at W3Schools](https://www.w3schools.com/sql/sql_join.asp)
+* [Join at Wikipedia](https://en.wikipedia.org/wiki/Join_(SQL))
+
+
 ## Indexes
 
 When searching through tables, you use a `WHERE` clause to narrow things down. For speed, the columns mentioned in the `WHERE` clause should either be a primary key, or a column for which an *index* has been built.
@@ -412,6 +544,7 @@ Non-normalized tables are considered an anti-pattern in relational databases.
 
 There are many *normal forms*. We'll talk about First, Second, and Third
 normal forms.
+
 
 ### Anomalies
 
@@ -531,20 +664,18 @@ produce eggs in the farm:
 
 TODO Verify above SQL
 
+### More reading:
+
+* [Database Normalization Explained in Simple English](https://www.essentialsql.com/get-ready-to-learn-sql-database-normalization-explained-in-simple-english/)
+
+* [Description of the database normalization basics](https://support.microsoft.com/en-us/help/283878/description-of-the-database-normalization-basics)
+
+* [Database Normalization, Wikipedia](https://en.wikipedia.org/wiki/Database_normalization) (Dense)
+
+
+
 # TODO
 
-* Normalization
-    * Anomalies
-    * https://www.essentialsql.com/get-ready-to-learn-sql-database-normalization-explained-in-simple-english/
-    * https://support.microsoft.com/en-us/help/283878/description-of-the-database-normalization-basics 
-    * https://en.wikipedia.org/wiki/Database_normalization (Dense)
-
-* Joins
-        * Inner
-        * Outer--left, right, full
-        * https://www.w3schools.com/sql/sql_join.asp
-        * https://en.wikipedia.org/wiki/Join_(SQL)
-        * Foreign Keys
 
     * Node Postgres
         * https://node-postgres.com/
