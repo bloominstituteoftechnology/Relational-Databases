@@ -3,28 +3,29 @@
 ## What is a relational database?
 
 Data stored as row records in tables. Imagine a spreadsheet with column
-headers describing the contents of each field, and each row is a
+headers describing the contents of each column, and each row is a
 record.
 
 A database can contain many tables. A table can contain many rows. A row
-can contain many fields.
+can contain many columns.
 
-Records are related to those in different tables through common fields
+Records are related to those in different tables through common columns
 that are present in both tables.
 
-For example, an `Employee` table might have the following fields in each
-record:
+For example, an `Employee` table might have the following columns in
+each record:
 
     Employee
         EmployeeID  FirstName  LastName  DepartmentID
 
-And a `Department` table might have the following fields in each record:
+And a `Department` table might have the following columns in each
+record:
 
     Department
         DepartmentID  DepartmentName
 
 Notice that both `Employee` and `Department` have a `DepartmentID`
-field. This common field *relates* the two tables and can be used to
+column. This common column *relates* the two tables and can be used to
 *join* them together with a *query*.
 
 
@@ -246,11 +247,11 @@ In a relational database, these functions are handled by `INSERT`,
 ## NULL and NOT NULL
 
 Columns in records can sometimes have no data, referred to by the
-special keyword as `NULL`. Sometimes it makes sense to have NULL fields,
-and sometimes it doesn't.
+special keyword as `NULL`. Sometimes it makes sense to have NULL
+columns, and sometimes it doesn't.
 
-If you explicitly want to disallow NULL fields in your table, you can
-create the fields with the `NOT NULL` constraint:
+If you explicitly want to disallow NULL columns in your table, you can
+create the columns with the `NOT NULL` constraint:
 
     CREATE TABLE Employee (
         ID INT NOT NULL,
@@ -375,9 +376,9 @@ CREATE TABLE example (
     PRIMARY KEY (a, c));
 ```
 
-## Auto-increment Fields
+## Auto-increment Columns
 
-These are fields that the database manages, usually in an
+These are columns that the database manages, usually in an
 ever-increasing sequence. It's perfect for generation unique, numeric
 IDs for primary Keys.
 
@@ -393,7 +394,7 @@ CREATE TABLE Company (
     NAME VARCHAR(20));
 ```
 
-When you insert, **do not** specify the ID field. Leave it blank, and
+When you insert, **do not** specify the ID column. Leave it blank, and
 the database will automatically generate one for you.
 
 ```sql
@@ -756,7 +757,7 @@ Additionally, columns that relate to each other AND to the key need to
 be moved into their own tables. This is known as removing *transitive
 dependencies*.
 
-In the Farm example, the fields `Breed` and `ProducesEggs` are related.
+In the Farm example, the columns `Breed` and `ProducesEggs` are related.
 If you know the breed, you automatically know if it produces eggs or
 not.
 
@@ -832,6 +833,16 @@ should follow to keep things safe.
 * [Command-line Earthquake Query Tool](#assignment-command-line-earthquake-query-tool)
 
 * [RESTful Earthquake Data Server](#assignment-restful-earthquake-data-server)
+
+
+## Other Relational Databases
+
+There are tons of them by Microsoft, Oracle, etc. etc.
+
+Other popular open source databases in widespread use are:
+
+* [MySQL](https://www.mysql.com/) Multi-user, industrial class.
+* [SQLite](https://www.sqlite.org/) Single-user, very fast, good for config files.
 
 ## Assignment: Install PostgreSQL
 
@@ -990,9 +1001,9 @@ Hints:
 * [Running a query](https://node-postgres.com/features/queries)
 
 Extra Credit:
-* Add an ID field to help normalize the database. Make this field
+* Add an ID column to help normalize the database. Make this column
   `SERIAL` to auto-increment.
-* Add Date, Lat, and Lon fields to record more information about the
+* Add Date, Lat, and Lon columns to record more information about the
   event.
 
 ## Assignment: Command-line Earthquake Query Tool
@@ -1069,7 +1080,3 @@ or
 `/delete` (DELETE) Delete an earthquake from the database. Use form
 encoding to pass `name`. Return status similar to `/new`, above.
 
-
-# TODO
-
-* Other RDBS: MySQL, Sqlite
