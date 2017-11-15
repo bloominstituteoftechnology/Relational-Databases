@@ -241,7 +241,9 @@ create the fields with the `NOT NULL` constraint:
         ID INT NOT NULL,
         LastName VARCHAR(20));
 
-## Keys, Primary and Foreign
+## Keys, Primary, Foreign, and Composite
+
+### Primary Key
 
 Rows in a table often have one column that is called the *primary key*.
 The value in this column applies to all the rest of the data in the
@@ -262,9 +264,12 @@ To create a table and specify the primary key, use the `NOT NULL` and
 
 You can always search quickly by primary key.
 
+### Foreign Keys
+
 If a key refers to a primary key in another table, it is called a
-*foreign key*. You are not allowed to make changes to the database that
-would cause the foreign key to refer to a non-existent record.
+*foreign key* (abbreviated "FK"). You are not allowed to make changes to
+the database that would cause the foreign key to refer to a non-existent
+record.
 
 The database uses this to maintain *referential integrity*.
 
@@ -287,6 +292,16 @@ In the above example, you cannot add a row to `Employee` until that
 Also, you cannot delete a row from `Department` if that row's `ID` was a
 `DepartmentID` in `Employee`.
 
+### Composite Keys
+
+Keys can also consist of more than one column. *Composite keys* can be
+created as follows:
+
+    CREATE TABLE example (
+        a INT,
+        b INT,
+        c INT,
+        PRIMARY KEY (a, c));
 
 ## Indexes
 
@@ -365,6 +380,24 @@ block. It is a mini transaction that is `COMMIT`ted immediately.
 Not all SQL databases support transactions, but most do.
 
 
+## The EXPLAIN Command
+
+The `EXPLAIN` command will tell you how much time the database is
+spending doing a query, and what it's doing in that time.
+
+It's a powerful command that can help tell you where you need to add
+indexes, change structure, or rewrite queries.
+
+    dbname=> EXPLAIN SELECT * FROM foo;
+    
+                           QUERY PLAN
+    ---------------------------------------------------------
+     Seq Scan on foo  (cost=0.00..155.00 rows=10000 width=4)
+    (1 row)
+
+For more information, see the [PostgreSQL EXPLAIN documentation](https://www.postgresql.org/docs/current/static/sql-explain.html)
+
+
 ## Normalization and Normal Forms
 
 *[This topic is very deep and this section cannot do it full justice.]*
@@ -386,10 +419,12 @@ When a database is in first normal form, there is a primary key for each
 row, and there are no repeating sets of columns that should be in their
 own table.
 
-Unnormalized:
+Unnormalized (column titles on separate lines for clarity):
 
     Farm
-        ID  AnimalName1  AnimalName2  AnimalName3  AnimalName4
+        ID
+        AnimalName1  AnimalBreed1  AnimalProducesEggs1
+        AnimalName2  AnimalBreed2  AnimalProducesEggs2
 
 1NF:
 
@@ -397,9 +432,8 @@ Unnormalized:
         ID
 
     Animal
-        ID
-        FarmID [foreign key on Farm(ID)]
-        Name
+        ID  FarmID[FK Farm(ID)]  Name  Breed  ProducesEggs
+
 
 Use a *join* [TODO make link] to select all the animals in the farm:
 
@@ -424,12 +458,10 @@ We can fix this by adding a table to link the other two tables together:
         ID
 
     FarmAnimal
-        FarmID [foreign key on Farm(ID)]
-        AnimalID [foreign key on Animal(ID)]
+        FarmID[FK Farm(ID)]  AnimalID[FK Animal(ID)]
 
     Animal
-        ID
-        Name
+        ID  Name  Breed  ProducesEggs
 
 Use a *join* [TODO make link] to select all the animals in the farm:
 
@@ -442,20 +474,53 @@ TODO: verify above SQL
 
 ### Third Normal Form (3NF)
 
-TODO
+A table in 3NF must already be in 2NF.
+
+Additionally, columns that relate to each other AND to the key need to
+be moved into their own tables. This is known as removing *transitive
+dependencies*.
+
+In the Farm example, the fields `Breed` and `ProducesEggs` are related.
+If you know the breed, you automatically know if it produces eggs or
+not.
+
+3NF:
+
+    Farm
+        ID
+
+    FarmAnimal
+        FarmID[FK Farm(ID)]  AnimalID[FK Animal(ID)]
+
+    BreedEggs
+        Breed  ProducesEggs
+
+    Animal
+        ID  Name  Breed[FK BreedEggs(Breed)]
+
+Use a *join* [TODO make link] to select all the animals names that
+produce eggs in the farm:
+
+    SELECT Name FROM Animal, FarmAnimal, BreedEggs, Farm
+        WHERE Farm.ID = FarmAnimal.FarmID AND
+              Animal.ID = FarmAnimal.AnimalID AND
+              Animal.Breed = BreedEggs.Breed AND
+              BreedEggs.ProducesEggs = TRUE;
+
+TODO Verify above SQL
 
 # TODO
 
-    * EXPLAIN
+* EXPLAIN
 
-    * Normalization
-        * Normal forms overview
-        * Anomalies
-        * https://www.essentialsql.com/get-ready-to-learn-sql-database-normalization-explained-in-simple-english/
-        * https://support.microsoft.com/en-us/help/283878/description-of-the-database-normalization-basics 
-        * https://en.wikipedia.org/wiki/Database_normalization (Dense)
+* Normalization
+    * Normal forms overview
+    * Anomalies
+    * https://www.essentialsql.com/get-ready-to-learn-sql-database-normalization-explained-in-simple-english/
+    * https://support.microsoft.com/en-us/help/283878/description-of-the-database-normalization-basics 
+    * https://en.wikipedia.org/wiki/Database_normalization (Dense)
 
-    * Joins
+* Joins
         * Inner
         * Outer--left, right, full
         * https://www.w3schools.com/sql/sql_join.asp
