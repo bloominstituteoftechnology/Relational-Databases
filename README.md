@@ -40,7 +40,7 @@ and world-class.
 
 https://www.postgresql.org/
 
-* [Assignment: Install PostgreSQL](#assignment-install-postgresql)
+* **Assignment:** [Install PostgreSQL](#assignment-install-postgresql)
 
 ## SQL, Structured Query Language
 
@@ -196,7 +196,7 @@ away. Destroyed ...by the Empire.
     dbname=> DROP TABLE Employee;
     DROP TABLE
 
-* [Assignment: Create a Table and Use It](#assignment-create-a-table-and-use-it)
+* **Assignment:** [Create a Table and Use It](#assignment-create-a-table-and-use-it)
   
 ## ACID and CRUD
 
