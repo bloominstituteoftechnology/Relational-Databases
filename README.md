@@ -607,8 +607,8 @@ Pseudocode making DB calls that check if a rollback is necessary:
 ```javascript
 db("BEGIN"); // Begin transaction
 
-db("UPDATE accounts SET balance = balance - 100.00
-    WHERE name = 'Alice'");
+db(`UPDATE accounts SET balance = balance - 100.00
+    WHERE name = 'Alice'`);
 
 let balance = db("SELECT balance WHERE name = 'Alice'");
 
