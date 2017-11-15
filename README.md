@@ -94,11 +94,13 @@ You can omit the column names if you're putting data in every column:
 
 Run some more inserts into the table:
 
-    INSERT INTO Employee VALUES (11, 'Alice');
-    INSERT INTO Employee VALUES (12, 'Bob');
-    INSERT INTO Employee VALUES (13, 'Charlie');
-    INSERT INTO Employee VALUES (14, 'Dave');
-    INSERT INTO Employee VALUES (15, 'Eve');
+```sql
+INSERT INTO Employee VALUES (11, 'Alice');
+INSERT INTO Employee VALUES (12, 'Bob');
+INSERT INTO Employee VALUES (13, 'Charlie');
+INSERT INTO Employee VALUES (14, 'Dave');
+INSERT INTO Employee VALUES (15, 'Eve');
+```
 
 ### Read rows with SELECT
 
@@ -117,7 +119,7 @@ Query all the rows and columnts:
      15 | Eve
     (6 rows)
 
-With SELECT, `*` means "all columns".
+With `SELECT`, `*` means "all columns".
 
 You can choose specific columns:
 
@@ -147,6 +149,18 @@ And you can search for specific rows with the `WHERE` clause:
      14 | Dave
     (2 rows)
 
+Finally, you can rename the output columns, if you wish:
+
+```sql
+SELECT id AS Employee ID, LastName AS Name
+    FROM Employee
+    WHERE ID=14 OR LastName='Bob';
+    
+ Employee ID | Name 
+-------------+----------
+     12      | Bob
+     14      | Dave
+```
 
 ### Update rows with UPDATE
 
@@ -242,7 +256,58 @@ create the fields with the `NOT NULL` constraint:
         ID INT NOT NULL,
         LastName VARCHAR(20));
 
-## Keys, Primary, Foreign, and Composite
+## COUNT
+
+You can select a count of items in question with the `COUNT` operator.
+
+For example, count the rows filtered by the `WHERE` clause:
+
+```sql
+SELECT COUNT(*) FROM Animals WHERE legcount >= 4;
+
+ count 
+-------
+     5
+```
+
+Useful with [`GROUP BY`](#group-by), below.
+
+## ORDER BY
+
+`ORDER BY` which sorts `SELECT` results for you. Use `DESC` to sort in
+reverse order.
+
+```sql
+SELECT * FROM Pets
+ORDER BY age DESC;
+
+  name     | age 
+-----------+-----
+ Rover     |   9
+ Zaphod    |   4
+ Mittens   |   3
+```
+
+## GROUP BY
+
+When used with an aggregating function like [`COUNT`](#count), can be
+used to produce groups of results.
+
+Count all the customers in certain countries:
+
+```sql
+SELECT COUNT(CustomerID), Country
+    FROM Customers
+    GROUP BY Country;
+
+  COUNT(CustomerID)   |  Country 
+----------------------+-----------
+      1123            |    USA
+       734            |    Germany
+                     etc.
+```
+
+## Keys: Primary, Foreign, and Composite
 
 ### Primary Key
 
@@ -257,11 +322,13 @@ assuming the rest of the record held employee information.
 To create a table and specify the primary key, use the `NOT NULL` and
 `PRIMARY KEY` constraints:
 
-    CREATE TABLE Employee (
-        ID INT NOT NULL PRIMARY KEY,
-        LastName VARCHAR(20),
-        FirstName VARCHAR(20),
-        DepartmentID INT);
+```sql
+CREATE TABLE Employee (
+    ID INT NOT NULL PRIMARY KEY,
+    LastName VARCHAR(20),
+    FirstName VARCHAR(20),
+    DepartmentID INT);
+```
 
 You can always search quickly by primary key.
 
@@ -277,15 +344,17 @@ The database uses this to maintain *referential integrity*.
 Create a foreign key using the `REFERENCES` constraint. It specifies the
 remote table and column the key refers to.
 
-    CREATE TABLE Department (
-        ID INT NOT NULL PRIMARY KEY,
-        Name VARCHAR(20));
+```sql
+CREATE TABLE Department (
+    ID INT NOT NULL PRIMARY KEY,
+    Name VARCHAR(20));
 
-    CREATE TABLE Employee (
-        ID INT NOT NULL PRIMARY KEY,
-        LastName VARCHAR(20),
-        FirstName VARCHAR(20),
-        DepartmentID INT REFERENCES Department(ID));
+CREATE TABLE Employee (
+    ID INT NOT NULL PRIMARY KEY,
+    LastName VARCHAR(20),
+    FirstName VARCHAR(20),
+    DepartmentID INT REFERENCES Department(ID));
+```
 
 In the above example, you cannot add a row to `Employee` until that
 `DepartmentID` already exists in `Department`'s `ID`.
@@ -298,11 +367,13 @@ Also, you cannot delete a row from `Department` if that row's `ID` was a
 Keys can also consist of more than one column. *Composite keys* can be
 created as follows:
 
-    CREATE TABLE example (
-        a INT,
-        b INT,
-        c INT,
-        PRIMARY KEY (a, c));
+```sql
+CREATE TABLE example (
+    a INT,
+    b INT,
+    c INT,
+    PRIMARY KEY (a, c));
+```
 
 ## Auto-increment Fields
 
@@ -316,14 +387,18 @@ IDs for primary Keys.
 In PostgreSQL, use the `SERIAL` keyword to auto-generate sequential
 numeric IDs for records.
 
-    CREATE TABLE Company (
-        ID SERIAL PRIMARY KEY,
-        NAME VARCHAR(20));
+```sql
+CREATE TABLE Company (
+    ID SERIAL PRIMARY KEY,
+    NAME VARCHAR(20));
+```
 
 When you insert, **do not** specify the ID field. Leave it blank, and
 the database will automatically generate one for you.
 
-    INSERT INTO Company VALUES ('My Awesome Company');
+```sql
+INSERT INTO Company VALUES ('My Awesome Company');
+```
 
 
 ## Joins
@@ -335,24 +410,37 @@ When you have two (or more) tables with data you wish to retrieve from
 both, you do so by using a *join*. These come in a number of varieties,
 some of which are covered here.
 
+When you're using `SELECT` to make the join between two tables, you can
+specify the tables specific columns are from by using the `.` operator.
+This is especially useful when columns have the same name in the
+different tables:
+
+```sql
+SELECT Animal.name, Farm.name
+    FROM Animal, Farm
+    WHERE Animal.FarmID = Farm.ID;
+```
+
 Tables to use in these examples:
 
-    CREATE TABLE Department (
-        ID INT NOT NULL PRIMARY KEY,
-        Name VARCHAR(20));
+```sql
+CREATE TABLE Department (
+    ID INT NOT NULL PRIMARY KEY,
+    Name VARCHAR(20));
 
-    CREATE TABLE Employee (
-        ID INT NOT NULL PRIMARY KEY,
-        Name VARCHAR(20),
-        DepartmentID INT);
+CREATE TABLE Employee (
+    ID INT NOT NULL PRIMARY KEY,
+    Name VARCHAR(20),
+    DepartmentID INT);
 
-    INSERT INTO Department VALUES (10, 'Marketing');
-    INSERT INTO Department VALUES (11, 'Sales');
-    INSERT INTO Department VALUES (12, 'Entertainment');
+INSERT INTO Department VALUES (10, 'Marketing');
+INSERT INTO Department VALUES (11, 'Sales');
+INSERT INTO Department VALUES (12, 'Entertainment');
 
-    INSERT INTO Employee VALUES (1, 'Alice', 10);
-    INSERT INTO Employee VALUES (2, 'Bob', 12);
-    INSERT INTO Employee VALUES (3, 'Charlie', 99);
+INSERT INTO Employee VALUES (1, 'Alice', 10);
+INSERT INTO Employee VALUES (2, 'Bob', 12);
+INSERT INTO Employee VALUES (3, 'Charlie', 99);
+```
 
 **NOTE**: Importantly, department ID 11 is not referred to from
 `Employee`, and department ID 99 (Charlie) does not exist in
@@ -369,7 +457,7 @@ tables.
 For example, we don't see "Sales" or "Charlie" in the join because
 neither of them match up to the other table:
 
-    beejtestdb=> SELECT Employee.ID, Employee.Name, Department.Name
+    dbname=> SELECT Employee.ID, Employee.Name, Department.Name
                  FROM Employee, Department
                  WHERE Employee.DepartmentID = Department.ID;
     
@@ -382,7 +470,7 @@ neither of them match up to the other table:
 Above, we used a `WHERE` clause to perform the inner join. This is
 really common. But there is alternative syntax equivalent to the above:
 
-    beejtestdb=> SELECT Employee.ID, Employee.Name, Department.Name
+    dbname=> SELECT Employee.ID, Employee.Name, Department.Name
                  FROM Employee INNER JOIN Department
                  ON Employee.DepartmentID = Department.ID;
 
@@ -401,7 +489,7 @@ in for the missing values in the "right" table (the one after the
 
 Example:
 
-    beejtestdb=> SELECT Employee.ID, Employee.Name, Department.Name
+    dbname=> SELECT Employee.ID, Employee.Name, Department.Name
                  FROM Employee LEFT JOIN Department
                  ON Employee.DepartmentID = Department.ID;
 
@@ -422,7 +510,7 @@ the "right" table (the one after the `RIGHT JOIN` clause). It puts
 `NULL` in for the missing values in the "right" table (the one after the
 `FROM` clause.)
 
-    beejtestdb=> SELECT Employee.ID, Employee.Name, Department.Name
+    dbname=> SELECT Employee.ID, Employee.Name, Department.Name
                  FROM Employee RIGHT JOIN Department
                  ON Employee.DepartmentID = Department.ID;
 
@@ -441,7 +529,7 @@ the Sales name is listed with a `NULL` employee name.
 This is a blend of a Left and Right Outer Join. All information from
 both tables is selected, with `NULL` filling the gaps where necessary.
 
-     beejtestdb=> SELECT Employee.ID, Employee.Name, Department.Name
+     dbname=> SELECT Employee.ID, Employee.Name, Department.Name
                   FROM Employee
                   FULL JOIN Department
                   ON Employee.DepartmentID = Department.ID;
@@ -515,19 +603,21 @@ either commits or rolls back.
 
 Pseudocode making DB calls that check if a rollback is necessary:
 
-    db("BEGIN"); // Begin transaction
+```javascript
+db("BEGIN"); // Begin transaction
 
-    db("UPDATE accounts SET balance = balance - 100.00
-        WHERE name = 'Alice'");
+db("UPDATE accounts SET balance = balance - 100.00
+    WHERE name = 'Alice'");
 
-    balance = db("SELECT balance WHERE name = 'Alice'");
+let balance = db("SELECT balance WHERE name = 'Alice'");
 
-    // Don't let the balance go below zero:
-    if (balance < 0) {
-        db("ROLLBACK"); // Never mind!! Roll it all back.
-    } else {
-        db("COMMIT"); // Plenty of cash
-    }
+// Don't let the balance go below zero:
+if (balance < 0) {
+    db("ROLLBACK"); // Never mind!! Roll it all back.
+} else {
+    db("COMMIT"); // Plenty of cash
+}
+```
     
 In the above example, the `UPDATE` and `SELECT` must happen at the same
 time (*atomically*) or else another process could sneak in between and
@@ -567,7 +657,8 @@ For more information, see the [PostgreSQL EXPLAIN documentation](https://www.pos
 for maximum consistency and minimum redundancy.
 
 With NoSQL databases, we're used to *denormalized* data that is stored
-with speed in mind, and not so much consistency (sometimes NoSQL databases talk about *eventual consistency*).
+with speed in mind, and not so much consistency (sometimes NoSQL
+databases talk about *eventual consistency*).
 
 Non-normalized tables are considered an anti-pattern in relational databases.
 
@@ -619,11 +710,11 @@ Unnormalized (column titles on separate lines for clarity):
         ID  FarmID[FK Farm(ID)]  Name  Breed  ProducesEggs
 
 
-Use a *join* [TODO make link] to select all the animals in the farm:
+Use a [*join*](#joins) to select all the animals in the farm:
 
-    SELECT Name FROM Animal, Farm WHERE Farm.ID = Animal.FarmID;
-
-TODO: verify above SQL
+```sql
+SELECT Name, Farm.ID FROM Animal, Farm WHERE Farm.ID = Animal.FarmID;
+```
 
 ### Second Normal Form (2NF)
 
@@ -647,13 +738,14 @@ We can fix this by adding a table to link the other two tables together:
     Animal
         ID  Name  Breed  ProducesEggs
 
-Use a *join* [TODO make link] to select all the animals in the farm:
+Use a [*join*](#joins) to select all the animals in the farms:
 
-    SELECT Name FROM Animal, FarmAnimal, Farm
-        WHERE Farm.ID = FarmAnimal.FarmID AND
-              Animal.ID = FarmAnimal.AnimalID;
-
-TODO: verify above SQL
+```sql
+SELECT Name, Farm.ID
+    FROM Animal, FarmAnimal, Farm
+    WHERE Farm.ID = FarmAnimal.FarmID AND
+          Animal.ID = FarmAnimal.AnimalID;
+```
 
 
 ### Third Normal Form (3NF)
@@ -682,16 +774,18 @@ not.
     Animal
         ID  Name  Breed[FK BreedEggs(Breed)]
 
-Use a *join* [TODO make link] to select all the animals names that
-produce eggs in the farm:
+Use a [*join*](#joins) to select all the animals names that produce eggs
+in the farm:
 
-    SELECT Name FROM Animal, FarmAnimal, BreedEggs, Farm
-        WHERE Farm.ID = FarmAnimal.FarmID AND
-              Animal.ID = FarmAnimal.AnimalID AND
-              Animal.Breed = BreedEggs.Breed AND
-              BreedEggs.ProducesEggs = TRUE;
+```sql
+SELECT Name, Farm.ID
+    FROM Animal, FarmAnimal, BreedEggs, Farm
+    WHERE Farm.ID = FarmAnimal.FarmID AND
+          Animal.ID = FarmAnimal.AnimalID AND
+          Animal.Breed = BreedEggs.Breed AND
+          BreedEggs.ProducesEggs = TRUE;
+```
 
-TODO Verify above SQL
 
 ### More reading:
 
@@ -711,6 +805,13 @@ Its [documentation](https://node-postgres.com/) is exceptionally good.
 
 * [Node-Postgres on GitHub](https://github.com/brianc/node-postgres)
 
+### Assignments
+
+* [NodeJS Program to Create and Populate a Table](#assignment-nodejs-program-to-create-and-populate-a-table)
+
+* [Command-line Earthquake Query Tool](#assignment-command-line-earthquake-query-tool)
+
+* [RESTful Earthquake Data Server](#assignment-restful-earthquake-data-server)
 
 ## Assignment: Install PostgreSQL
 
@@ -768,33 +869,45 @@ Arch).
 
 Launch the shell on your database, and create a table.
 
-    CREATE TABLE Employee (ID INT, FirstName VARCHAR(20), LastName VARCHAR(20));
+```sql
+CREATE TABLE Employee (ID INT, FirstName VARCHAR(20), LastName VARCHAR(20));
+```
 
 Insert some records:
 
-    INSERT INTO Employee VALUES (1, 'Alpha', 'Alphason');
-    INSERT INTO Employee VALUES (2, 'Bravo', 'Bravoson');
-    INSERT INTO Employee VALUES (3, 'Charlie', 'Charleson');
-    INSERT INTO Employee VALUES (4, 'Delta', 'Deltason');
-    INSERT INTO Employee VALUES (5, 'Echo', 'Ecoson');
+```sql
+INSERT INTO Employee VALUES (1, 'Alpha', 'Alphason');
+INSERT INTO Employee VALUES (2, 'Bravo', 'Bravoson');
+INSERT INTO Employee VALUES (3, 'Charlie', 'Charleson');
+INSERT INTO Employee VALUES (4, 'Delta', 'Deltason');
+INSERT INTO Employee VALUES (5, 'Echo', 'Ecoson');
+```
 
 Select all records:
 
-    SELECT * FROM Employee;
+```sql
+SELECT * FROM Employee;
+```
 
 Select Employee #3's record:
 
-    SELECT * FROM Employee WHERE ID=3;
+```sql
+SELECT * FROM Employee WHERE ID=3;
+```
 
 Delete Employee #3's record:
 
-    DELETE FROM Employee WHERE ID=3;
+```sql
+DELETE FROM Employee WHERE ID=3;
+```
  
 Use `SELECT` to verify the record is deleted.
 
 Update Employee #2's name to be "Foxtrot Foxtrotson":
 
-    UPDATE Employee SET FirstName='Foxtrot', LastName='Foxtrotson' WHERE ID=2;
+```sql
+UPDATE Employee SET FirstName='Foxtrot', LastName='Foxtrotson' WHERE ID=2;
+```
 
 Use `SELECT` to verify the update.
 
@@ -804,10 +917,12 @@ Use `SELECT` to verify the update.
 Using [Node-Postgres](https://node-postgres.com/), write a program that
 creates a table.
 
-Run the following query:
+Run the following query from your JS code:
 
-    CREATE TABLE IF NOT EXISTS Earthquake
-        (Name VARCHAR(20), Magnitude REAL)
+```sql
+CREATE TABLE IF NOT EXISTS Earthquake
+    (Name VARCHAR(20), Magnitude REAL)
+```
 
 Populate the table with the following data:
 
@@ -936,8 +1051,6 @@ encoding to pass `name`. Return status similar to `/new`, above.
 
 
 # TODO
-
-* ORDER BY, GROUP BY
 
 * Security
     * Passwords, don't store in source control
