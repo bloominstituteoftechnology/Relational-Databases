@@ -450,7 +450,8 @@ INSERT INTO Employee VALUES (3, 'Charlie', 99);
 
 ### Inner Join, The Most Common Join
 
-This is a standard join, what people mean when they just say "join".
+This is the most commonly-used join, by far, and is what people mean
+when they just say "join" with no further qualifiers.
 
 This will return only the rows that match the requirements from **both**
 tables.
@@ -469,7 +470,9 @@ neither of them match up to the other table:
     (2 rows)
 
 Above, we used a `WHERE` clause to perform the inner join. This is
-really common. But there is alternative syntax equivalent to the above:
+absolutely the most common way to do it.
+
+There is an alternative syntax, below, that is barely ever used.
 
     dbname=> SELECT Employee.ID, Employee.Name, Department.Name
                  FROM Employee INNER JOIN Department
