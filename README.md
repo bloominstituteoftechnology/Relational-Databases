@@ -29,10 +29,39 @@ column. This common column *relates* the two tables and can be used to
 *join* them together with a *query*.
 
 
-Compare to NoSQL databases that work with key/value pairs or are document stores.
+Compare to NoSQL databases that work with key/value pairs or are
+document stores.
 
 * [Relational Database at Wikipedia](https://en.wikipedia.org/wiki/Relational_database)
 * [Non-relational (NoSQL) databases at Wikipedia](https://en.wikipedia.org/wiki/NoSQL)
+
+## Relational vs NoSQL
+
+*NoSQL* is a term that refers to non-relational databases, most usually
+document store databases. (Though it can apply to almost any kind of
+non-relational database.)
+
+MongoDB is a great example of a NoSQL database.
+
+### When Do You Use NoSQL Versus a Relational Database?
+
+Unfortunately, there are no definitive rules on when to choose one or
+the other.
+
+Do you need ACID-compliance? Consider a relational database.
+
+Does your schema (structure of data) change frequently? Consider NoSQL.
+
+Does absolute consistency in your data matter, e.g. a bank, inventory
+management system, employee management, academic records, etc.? Consider
+a relational database.
+
+Do you need easy-to-deploy high-availability? Consider NoSQL.
+
+Do you need transactions to happen atomically? (The ability to update
+multiple records simultaneously?) Consider a relational database.
+
+Do you need read-only access to piles of data? Consider NoSQL.
 
 ## PostgreSQL
 
