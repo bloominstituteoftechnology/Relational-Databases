@@ -1,5 +1,34 @@
 # Relational Databases and PostgreSQL
 
+
+## Contents
+
+* [What is a relational database?](#what-is-a-relational-database)
+* [Relational vs NoSQL](#relational-vs-nosql)
+* [PostgreSQL](#postgresql)
+* [SQL, Structured Query Language](#sql-structured-query-language)
+* [ACID and CRUD](#acid-and-crud)
+* [NULL and NOT NULL](#null-and-not-null)
+* [COUNT](#count)
+* [ORDER BY](#order-by)
+* [GROUP BY](#group-by)
+* [Keys: Primary, Foreign, and Composite](#keys-primary-foreign-and-composite)
+* [Auto-increment Columns](#auto-increment-columns)
+* [Joins](#joins)
+* [Indexes](#indexes)
+* [Transactions](#transactions)
+* [The EXPLAIN Command](#the-explain-command)
+* [Normalization and Normal Forms](#normalization-and-normal-forms)
+* [Node-Postgres](#node-postgres)
+* [Security](#security)
+* [Other Relational Databases](#other-relational-databases)
+* [Assignment: Install PostgreSQL](#assignment-install-postgresql)
+* [Assignment: Create a Table and Use It](#assignment-create-a-table-and-use-it)
+* [Assignment: NodeJS Program to Create and Populate a Table](#assignment-nodejs-program-to-create-and-populate-a-table)
+* [Assignment: Command-line Earthquake Query Tool](#assignment-command-line-earthquake-query-tool)
+* [Assignment: RESTful Earthquake Data Server](#assignment-restful-earthquake-data-server)
+
+
 ## What is a relational database?
 
 Data stored as row records in tables. Imagine a spreadsheet with column
@@ -35,6 +64,7 @@ document stores.
 * [Relational Database at Wikipedia](https://en.wikipedia.org/wiki/Relational_database)
 * [Non-relational (NoSQL) databases at Wikipedia](https://en.wikipedia.org/wiki/NoSQL)
 
+
 ## Relational vs NoSQL
 
 *NoSQL* is a term that refers to non-relational databases, most usually
@@ -63,6 +93,7 @@ multiple records simultaneously?) Consider a relational database.
 
 Do you need read-only access to piles of data? Consider NoSQL.
 
+
 ## PostgreSQL
 
 PostgreSQL is a venerable relational database that is freely available
@@ -71,6 +102,7 @@ and world-class.
 https://www.postgresql.org/
 
 * **Assignment:** [Install PostgreSQL](#assignment-install-postgresql)
+
 
 ## SQL, Structured Query Language
 
@@ -273,6 +305,7 @@ functions of a data store.
 In a relational database, these functions are handled by `INSERT`,
 `SELECT`, `UPDATE`, and `DELETE`.
 
+
 ## NULL and NOT NULL
 
 Columns in records can sometimes have no data, referred to by the
@@ -285,6 +318,7 @@ create the columns with the `NOT NULL` constraint:
     CREATE TABLE Employee (
         ID INT NOT NULL,
         LastName VARCHAR(20));
+
 
 ## COUNT
 
@@ -302,6 +336,7 @@ SELECT COUNT(*) FROM Animals WHERE legcount >= 4;
 
 Useful with [`GROUP BY`](#group-by), below.
 
+
 ## ORDER BY
 
 `ORDER BY` which sorts `SELECT` results for you. Use `DESC` to sort in
@@ -317,6 +352,7 @@ ORDER BY age DESC;
  Zaphod    |   4
  Mittens   |   3
 ```
+
 
 ## GROUP BY
 
@@ -336,6 +372,7 @@ SELECT COUNT(CustomerID), Country
        734            |    Germany
                      etc.
 ```
+
 
 ## Keys: Primary, Foreign, and Composite
 
@@ -404,6 +441,7 @@ CREATE TABLE example (
     c INT,
     PRIMARY KEY (a, c));
 ```
+
 
 ## Auto-increment Columns
 
@@ -622,7 +660,7 @@ There will never be a case where a transaction partially occurs.
 Create a transaction by starting with a `BEGIN` statement, followed by
 all the statements that are to be within the transaction.
 
->`START TRANSACTION` is generally synonymous with `BEGIN` in SQL.
+> `START TRANSACTION` is generally synonymous with `BEGIN` in SQL.
 
 To execute the transaction ("Let's do it!"), end with a `COMMIT`
 statement.
@@ -839,7 +877,17 @@ Its [documentation](https://node-postgres.com/) is exceptionally good.
 
 * [Node-Postgres on GitHub](https://github.com/brianc/node-postgres)
 
-### Security
+
+### Assignments
+
+* [NodeJS Program to Create and Populate a Table](#assignment-nodejs-program-to-create-and-populate-a-table)
+
+* [Command-line Earthquake Query Tool](#assignment-command-line-earthquake-query-tool)
+
+* [RESTful Earthquake Data Server](#assignment-restful-earthquake-data-server)
+
+
+## Security
 
 When writing code that accesses databases, there are a few rules you
 should follow to keep things safe.
@@ -858,15 +906,6 @@ should follow to keep things safe.
   **It's a seriously noob move to not use parameterized queries.**
 
 
-### Assignments
-
-* [NodeJS Program to Create and Populate a Table](#assignment-nodejs-program-to-create-and-populate-a-table)
-
-* [Command-line Earthquake Query Tool](#assignment-command-line-earthquake-query-tool)
-
-* [RESTful Earthquake Data Server](#assignment-restful-earthquake-data-server)
-
-
 ## Other Relational Databases
 
 There are tons of them by Microsoft, Oracle, etc. etc.
@@ -875,6 +914,7 @@ Other popular open source databases in widespread use are:
 
 * [MySQL](https://www.mysql.com/) Multi-user, industrial class.
 * [SQLite](https://www.sqlite.org/) Single-user, very fast, good for config files.
+
 
 ## Assignment: Install PostgreSQL
 
@@ -1037,6 +1077,7 @@ Extra Credit:
   `SERIAL` to auto-increment.
 * Add Date, Lat, and Lon columns to record more information about the
   event.
+
 
 ## Assignment: Command-line Earthquake Query Tool
 
