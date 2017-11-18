@@ -7,6 +7,7 @@
 * [Relational vs NoSQL](#relational-vs-nosql)
 * [PostgreSQL](#postgresql)
 * [SQL, Structured Query Language](#sql-structured-query-language)
+* [Column Data Types](#column-data-types)
 * [ACID and CRUD](#acid-and-crud)
 * [NULL and NOT NULL](#null-and-not-null)
 * [COUNT](#count)
