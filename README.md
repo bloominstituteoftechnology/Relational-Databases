@@ -1016,6 +1016,21 @@ Google for how to upgrade your installation.
 
 1. Open a terminal
 2. Install PostgreSQL: `brew install postgresql`
+
+    If you get install errors at this point relating to the link phase
+    failing or missing permissions, look back in the output and see
+    what file it failed to write.
+
+    For example, if it's failing to write something in
+    `/usr/local/share/man`-something, try setting the ownership on
+    those directories to yourself.
+
+    Example (from the command line):
+
+    `$ sudo chown -R $(whoami) /usr/local/share/man`
+
+    Then try to install again.
+
 3. Start the database process
     * If you want to start it every time you log in, run:
 
