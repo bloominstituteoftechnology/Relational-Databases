@@ -278,6 +278,52 @@ away. Destroyed ...by the Empire.
 * **Assignment:** [Create a Table and Use It](#assignment-create-a-table-and-use-it)
   
 
+## The `WHERE` Clause
+
+You've already seen some examples of how `WHERE` affects `SELECT`,
+`UPDATE`, and `DELETE`.
+
+Normal operators like `<`, `>`, `=`, `<=`, `>=` are available.
+
+For example:
+
+```sql
+SELECT * from animals
+    WHERE age >= 10;
+```
+
+### `AND`, `OR`, and Parentheses
+
+You can add more boolean logic with `AND`, `OR`, and affect precedence
+with parentheses:
+
+```sql
+SELECT * from animals
+    WHERE age >= 10 AND type = 'goat';
+```
+
+```sql
+SELECT * from animals
+    WHERE age >= 10 AND (type = 'goat' OR type = 'antelope');
+```
+
+### `LIKE`
+
+The `LIKE` operator can be used to do pattern matching.
+
+```sql
+_   -- Match any single character
+%   -- Match any sequence of characters
+```
+
+To select all animals that start with `ab`:
+
+```sql
+SELECT * from animal
+    WHERE name LIKE 'ab%';
+```
+
+
 ## Column Data Types
 
 You probably noticed a few data types we specified with `CREATE TABLE`,
