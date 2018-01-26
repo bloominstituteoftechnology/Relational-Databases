@@ -19,6 +19,7 @@
 * [Indexes](#indexes)
 * [Transactions](#transactions)
 * [The EXPLAIN Command](#the-explain-command)
+* [Quick and Dirty DB Design](#quick-and-dirty-db-design)
 * [Normalization and Normal Forms](#normalization-and-normal-forms)
 * [Node-Postgres](#node-postgres)
 * [Security](#security)
@@ -793,6 +794,30 @@ indexes, change structure, or rewrite queries.
 For more information, see the [PostgreSQL EXPLAIN documentation](https://www.postgresql.org/docs/current/static/sql-explain.html)
 
 
+## Quick and Dirty DB Design
+
+Designing a non-trivial database is a difficult, learned skill best left to
+professionals. Feel free to do small databases with minimal training, but if you
+get in a professional situation with a large database that needs to be designed,
+you should consult with people with strong domain knowledge.
+
+That said, here are a couple pointers.
+
+* In general, all your tables should have a unique `PRIMARY KEY` for each row.
+  It's common to use `SERIAL` or `AUTO_INCREMENT` to make this happen.
+
+* Keep an eye out for commonly duplicated data. If you are duplicating text data
+  across several records, consider that maybe it should be in its own table and
+  referred to with a foreign key.
+
+* Watch out for unrelated data in the same record. If it's a record in the
+  `Employee` table but it has `Department_Address` as a column, that probably
+  belongs in a `Department` table, referred to by a public key.
+
+But if you really want to design database, read on to the [Normalization and
+Normal Forms](#normalization-and-normal-forms) section.
+
+
 ## Normalization and Normal Forms
 
 *[This topic is very deep and this section cannot do it full justice.]*
@@ -1064,7 +1089,11 @@ You can enter `\q` to exit the shell.
 
 ### Windows
 
-You can [download a Windows
+Reports are that one of the easiest installs is with
+[chocolatey](https://chocolatey.org/packages/postgresql). Might want to try that
+first.
+
+You can also [download a Windows
 installer](https://www.postgresql.org/download/windows/) from the
 official site.
 
@@ -1073,8 +1102,6 @@ Linux](https://msdn.microsoft.com/en-us/commandline/wsl/install-win10)
 and follow the [Ubuntu instructions for installing
 PostgreSQL](https://help.ubuntu.com/community/PostgreSQL).
 
-We have not attempted either of these as of this writing, so if you
-succeed, details would be appreciated.
 
 ### Arch Linux
 
