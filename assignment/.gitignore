@@ -1,0 +1,4 @@
+.*.swp
+.vscode
+node_modules
+.env
