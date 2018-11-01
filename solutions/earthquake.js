@@ -1,8 +1,8 @@
-const { Client } = require('pg');
+const { Client } = require("pg");
 
 /**
  * Does the heavy lifting.
- * 
+ *
  * Function is async so we can use await.
  */
 async function run(mag) {
@@ -26,14 +26,15 @@ async function run(mag) {
     const res = await client.query(query, [mag]);
 
     // Print the results
-    console.log(`Earthquakes with magnitudes greater than or equal to ${mag}:\n`);
+    console.log(
+      `Earthquakes with magnitudes greater than or equal to ${mag}:\n`
+    );
 
     for (let row of res.rows) {
-        console.log(`${row.name}: ${row.magnitude}`);
+      console.log(`${row.name}: ${row.magnitude}`);
     }
 
     await client.end();
-
   } catch (err) {
     console.log(err);
   }
